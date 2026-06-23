@@ -14,6 +14,8 @@ import { Card } from "../src/components/Card";
 import { Button } from "../src/components/Button";
 // GuildPass Mobile: Import package module dependencies.
 import { WalletInput } from "../src/components/WalletInput";
+// GuildPass Mobile: Import package module dependencies.
+import { validateAndNormalizeAddress } from "../src/lib/walletValidation";
 // GuildPass Mobile: Pull in react-native, expo, or external state libraries.
 import { AccessStatusCard } from "../src/components/AccessStatusCard";
 // GuildPass Mobile: Import package module dependencies.
@@ -36,6 +38,8 @@ export default function AccessCheck() {
     resourceId: string;
     // GuildPass Mobile: Exit functional execution container scope block.
   } | null>(null);
+  // GuildPass Mobile: Local UI-scoped constant or state representation.
+  const [addressError, setAddressError] = useState<string | null>(null);
 
   // GuildPass Mobile: Local UI-scoped constant or state representation.
   const { checkAccess } = useAccessCheck();
@@ -50,7 +54,13 @@ export default function AccessCheck() {
   const handleCheck = () => {
     // GuildPass Mobile: Evaluate branch condition check for UI guards.
     if (address && guildId && resourceId) {
-      setCheckParams({ walletAddress: address, guildId, resourceId });
+      const result = validateAndNormalizeAddress(address);
+      if (!result.valid) {
+        setAddressError(result.error);
+        return;
+      }
+      setAddressError(null);
+      setCheckParams({ walletAddress: result.address, guildId, resourceId });
       // GuildPass Mobile: Exit functional execution container scope block.
     }
     // GuildPass Mobile: Exit functional execution container scope block.
@@ -64,9 +74,10 @@ export default function AccessCheck() {
         <Card className="mb-6">
           <WalletInput
             value={address}
-            onChangeText={setAddress}
+            onChangeText={(text) => { setAddress(text); setAddressError(null); }}
             // GuildPass Mobile: Variable binding and property initialization.
             placeholder="Wallet address (0x...)"
+            error={addressError}
           />
 
           <View className="mt-4">
@@ -94,7 +105,7 @@ export default function AccessCheck() {
             onPress={handleCheck}
             className="mt-6"
             loading={isLoading}
-            disabled={!address || !guildId || !resourceId}
+            disabled={!address || !guildId || !resourceId || !!addressError}
           />
         </Card>
 
