@@ -28,16 +28,13 @@ export default function Profile() {
 
   // GuildPass Mobile: Variable binding and property initialization.
   const handleConnect = () => {
-    // GuildPass Mobile: Evaluate branch condition check for UI guards.
-    if (!inputValue.startsWith("0x") || inputValue.length !== 42) {
-      setError("Please enter a valid Ethereum address");
-      // GuildPass Mobile: Terminate block execution context and send back value.
+    const { success, error: validationError } = connectManually(inputValue);
+    if (!success) {
+      setError(validationError ?? "Invalid address");
       return;
-      // GuildPass Mobile: Exit functional execution container scope block.
     }
     setError(null);
-    connectManually(inputValue);
-    // GuildPass Mobile: Exit functional execution container scope block.
+    router.push("/guilds");
   };
 
   // GuildPass Mobile: Return evaluated JSX layout or callback response.
