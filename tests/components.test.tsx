@@ -20,10 +20,9 @@ describe("Core Components", () => {
       // GuildPass Mobile: Local UI-scoped constant or state representation.
       const onPress = vi.fn();
       // GuildPass Mobile: Variable binding and property initialization.
-      const { getByText } = render(<Button title="Test Button" onPress={onPress} />);
+      const { getByRole, getByText } = render(<Button title="Test Button" onPress={onPress} />);
 
-      // GuildPass Mobile: Local UI-scoped constant or state representation.
-      const button = getByText("Test Button");
+      const button = getByRole("button", { name: "Test Button" });
       expect(button).toBeDefined();
 
       fireEvent.press(button);
@@ -34,8 +33,10 @@ describe("Core Components", () => {
     // GuildPass Mobile: Mobile unit test assertion block.
     it("shows loading state", () => {
       // GuildPass Mobile: Variable binding and property initialization.
-      const { getByTestId } = render(<Button title="Loading" onPress={() => {}} loading />);
-      // ActivityIndicator is rendered
+      const { getByRole } = render(<Button title="Loading" onPress={() => {}} loading />);
+      const button = getByRole("button", { name: "Loading" });
+      expect(button).toBeDefined();
+      expect(button.props.accessibilityState?.busy).toBe(true);
     });
     // GuildPass Mobile: Exit functional execution container scope block.
   });

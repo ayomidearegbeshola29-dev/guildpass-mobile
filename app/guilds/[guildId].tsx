@@ -80,7 +80,7 @@ export default function GuildDetail() {
 
         <View className="mb-6">
           <Text className="text-lg font-bold text-text mb-3">Your Membership</Text>
-          <Card className={membership?.isActive ? "border-success/30" : ""}>
+          <Card className={membership?.isActive ? "border-success/30" : ""} accessibilityLabel={`Membership status: ${membership?.isActive ? "Active Member" : "Not a Member"}`}>
             <View className="flex-row justify-between items-center">
               <Text className="text-text font-medium">Status</Text>
               <Text

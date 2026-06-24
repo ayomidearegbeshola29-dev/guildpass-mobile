@@ -68,6 +68,9 @@ export const Button = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled || loading}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       // GuildPass Mobile: Enter functional execution container scope block.
       className={`py-4 px-6 rounded-xl flex-row justify-center items-center ${getVariantStyles()} ${
         disabled || loading ? "opacity-50" : ""

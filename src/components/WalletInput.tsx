@@ -31,6 +31,8 @@ export const WalletInput = ({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
+        accessibilityLabel="Wallet Address"
+        accessibilityHint="Enter your wallet address starting with 0x"
         // GuildPass Mobile: Enter functional execution container scope block.
         className={`bg-white border ${
           error ? "border-error" : "border-border"
@@ -39,7 +41,7 @@ export const WalletInput = ({
         autoCapitalize="none"
         autoCorrect={false}
       />
-      {error && <Text className="text-error mt-2 text-sm">{error}</Text>}
+      {error && <Text className="text-error mt-2 text-sm" accessibilityRole="alert">{error}</Text>}
     </View>
   );
   // GuildPass Mobile: Exit functional execution container scope block.

@@ -22,7 +22,7 @@ export const AppHeader = ({ title, showBack = false }: AppHeaderProps) => {
     <SafeAreaView className="bg-white border-b border-border">
       <View className="flex-row items-center px-4 py-3">
         {showBack && (
-          <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2">
+          <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2" accessibilityRole="button" accessibilityLabel="Go back">
             <Text className="text-primary text-2xl font-bold">←</Text>
           </TouchableOpacity>
         )}

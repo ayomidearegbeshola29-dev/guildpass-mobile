@@ -19,7 +19,7 @@ type GuildCardProps = {
 export const GuildCard = ({ name, id, isActive, roleCount, onPress }: GuildCardProps) => {
   // GuildPass Mobile: Terminate block execution context and send back value.
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={`${name}, ${isActive ? "Active" : "Inactive"}, ${roleCount} roles`}>
       <Card className="mb-4">
         <View className="flex-row justify-between items-center mb-2">
           <Text className="text-xl font-bold text-text">{name}</Text>

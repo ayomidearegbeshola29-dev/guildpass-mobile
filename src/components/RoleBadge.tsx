@@ -7,7 +7,7 @@ import React from "react";
 export const RoleBadge = ({ name }: { name: string }) => {
   // GuildPass Mobile: Terminate block execution context and send back value.
   return (
-    <View className="bg-primary/10 px-3 py-1.5 rounded-lg mr-2 mb-2">
+    <View className="bg-primary/10 px-3 py-1.5 rounded-lg mr-2 mb-2" accessibilityLabel={`Role: ${name}`}>
       <Text className="text-primary font-medium text-sm">{name}</Text>
     </View>
   );

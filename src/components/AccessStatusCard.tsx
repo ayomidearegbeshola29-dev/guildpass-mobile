@@ -27,13 +27,14 @@ export const AccessStatusCard = ({
   // GuildPass Mobile: Return evaluated JSX layout or callback response.
   return (
     <Card className={`border-2 ${hasAccess ? "border-success" : "border-error"}`}>
-      <View className="items-center mb-6">
+      <View className="items-center mb-6" accessibilityLiveRegion="polite">
         <View
           // GuildPass Mobile: Enter functional execution container scope block.
           className={`w-16 h-16 rounded-full items-center justify-center mb-4 ${
             hasAccess ? "bg-success" : "bg-error"
             // GuildPass Mobile: Exit functional execution container scope block.
           }`}
+          accessibilityLabel={hasAccess ? "Access granted" : "Access denied"}
         >
           <Text className="text-white text-3xl">{hasAccess ? "✓" : "✕"}</Text>
         </View>

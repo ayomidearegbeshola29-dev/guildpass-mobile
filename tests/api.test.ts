@@ -1,47 +1,57 @@
-import { describe, it, expect, vi } from "vitest";
+/**
+ * api.test.ts
+ *
+ * Smoke tests confirming that guildPassClient correctly delegates to the SDK.
+ * Detailed contract verification lives in sdk-contract.test.ts and tests/hooks/.
+ * These tests use the shared fixtures and mock factory so the mock shape is
+ * consistent across the entire test suite.
+ */
+
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { createSdkMock, resetSdkMock, mockSdkModule } from "./fixtures/sdk.mock";
+import { GUILD_DETAIL_FIXTURE } from "./fixtures/guild.fixtures";
+import { ACCESS_GRANTED_FIXTURE, ACCESS_CHECK_PARAMS } from "./fixtures/access.fixtures";
+
+vi.mock("@guildpass/sdk", mockSdkModule);
+vi.mock("expo-constants", () => ({ default: { expoConfig: { extra: {} } } }));
+
 import { guildPassClient } from "../src/lib/guildpassClient";
 
-// Mock the SDK
-vi.mock("@guildpass/sdk", () => {
-  return {
-    GuildPassClient: vi.fn().mockImplementation(() => ({
-      access: {
-        checkAccess: vi.fn().mockResolvedValue({
-          hasAccess: true,
-          matchedRoles: ["member"],
-          requiredRoles: ["member"],
-        }),
-      },
-      guilds: {
-        getGuild: vi.fn().mockResolvedValue({
-          id: "guild_1",
-          name: "Test Guild",
-          ownerAddress: "0x123",
-          chainId: 1,
-        }),
-      },
-    })),
-  };
-});
-
 describe("API Integrations", () => {
+  let sdk: ReturnType<typeof createSdkMock>;
+
+  beforeEach(() => {
+    sdk = createSdkMock();
+  });
+
+  afterEach(() => {
+    resetSdkMock();
+    vi.clearAllMocks();
+  });
+
   it("should call checkAccess with correct parameters", async () => {
-    const params = {
-      walletAddress: "0x123",
-      guildId: "guild_1",
-      resourceId: "res_1",
-    };
-    
-    const result = await guildPassClient.access.checkAccess(params);
-    
+    const result = await guildPassClient.access.checkAccess(ACCESS_CHECK_PARAMS);
+
     expect(result.hasAccess).toBe(true);
-    expect(guildPassClient.access.checkAccess).toHaveBeenCalledWith(params);
+    expect(sdk.access.checkAccess).toHaveBeenCalledWith(ACCESS_CHECK_PARAMS);
+  });
+
+  it("should return the access check response shape from the fixture", async () => {
+    const result = await guildPassClient.access.checkAccess(ACCESS_CHECK_PARAMS);
+
+    expect(result).toStrictEqual(ACCESS_GRANTED_FIXTURE);
   });
 
   it("should fetch guild data", async () => {
-    const guild = await guildPassClient.guilds.getGuild({ guildId: "guild_1" });
-    
-    expect(guild.name).toBe("Test Guild");
-    expect(guildPassClient.guilds.getGuild).toHaveBeenCalledWith({ guildId: "guild_1" });
+    const guild = await guildPassClient.guilds.getGuild({ guildId: "guild_abc" });
+
+    expect(guild.name).toBe(GUILD_DETAIL_FIXTURE.name);
+    expect(sdk.guilds.getGuild).toHaveBeenCalledWith({ guildId: "guild_abc" });
+  });
+
+  it("should return the full guild fixture shape", async () => {
+    const guild = await guildPassClient.guilds.getGuild({ guildId: "guild_abc" });
+
+    expect(guild).toStrictEqual(GUILD_DETAIL_FIXTURE);
   });
 });
