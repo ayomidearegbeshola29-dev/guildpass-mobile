@@ -17,8 +17,16 @@
       "supportsTablet": true,
       "bundleIdentifier": "xyz.guildpass.mobile",
       "infoPlist": {
-        "CFBundleDisplayName": "GuildPass"
-      }
+        "CFBundleDisplayName": "GuildPass",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["guildpass"]
+          }
+        ]
+      },
+      "associatedDomains": [
+        "applinks:guildpass.xyz"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -33,6 +41,10 @@
           "data": [
             {
               "scheme": "guildpass"
+            },
+            {
+              "scheme": "https",
+              "host": "guildpass.xyz"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

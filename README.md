@@ -160,6 +160,31 @@ QR access checks use a JSON payload encoded directly in the QR code:
 are optional. Unsupported types or versions, malformed JSON, missing required fields, invalid
 wallet addresses, and expired payloads are rejected before the access check is submitted.
 
+## � Deep Linking
+
+GuildPass Mobile supports deep linking, allowing external links to open specific screens within the app.
+
+### Supported Link Formats
+
+#### Guild Detail
+- **Custom Scheme**: `guildpass://guild/{guildId}`
+- **Universal Link**: `https://guildpass.xyz/guild/{guildId}`
+- **Example**: `guildpass://guild/alpha-guild`
+
+#### Access Check
+- **Custom Scheme**: `guildpass://access-check?guildId={id}&resourceId={id}&walletAddress={address}`
+- **Universal Link**: `https://guildpass.xyz/access-check?guildId={id}&resourceId={id}&walletAddress={address}`
+- **Example**: `guildpass://access-check?guildId=alpha-guild&resourceId=secret-channel&walletAddress=0x1234...`
+
+### Parameter Validation
+- Guild detail links require a valid `guildId`
+- Access check links require both `guildId` and `resourceId` parameters
+- `walletAddress` is optional for access check; if not provided, the app uses the connected wallet
+- Invalid or malformed links redirect to a user-friendly error screen
+
+### Cold Start Support
+Deep links work when the app is cold-started (not already running). The app will launch and navigate to the appropriate screen.
+
 ## 🗺️ Roadmap
 
 - [ ] **Native Wallet Integration**: Support for WalletConnect, MetaMask, and Coinbase Wallet.

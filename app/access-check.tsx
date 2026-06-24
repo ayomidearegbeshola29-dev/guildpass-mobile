@@ -2,6 +2,7 @@
 import { View, Text, ScrollView, TextInput } from "react-native";
 // GuildPass Mobile: Import package module dependencies.
 import React, { useEffect, useState } from "react";
+// GuildPass Mobile: Pull in react-native, expo, or external state libraries.
 import { useLocalSearchParams, useRouter } from "expo-router";
 // GuildPass Mobile: Pull in react-native, expo, or external state libraries.
 import { useWallet } from "../src/features/wallet/useWallet";
@@ -29,6 +30,8 @@ export default function AccessCheck() {
   // GuildPass Mobile: Variable binding and property initialization.
   const { walletAddress: currentWallet } = useWallet();
   // GuildPass Mobile: Local UI-scoped constant or state representation.
+  const params = useLocalSearchParams<{ guildId?: string; resourceId?: string; walletAddress?: string }>();
+  // GuildPass Mobile: Local UI-scoped constant or state representation.
   const [address, setAddress] = useState(currentWallet || "");
   // GuildPass Mobile: Variable binding and property initialization.
   const [guildId, setGuildId] = useState("");
@@ -44,7 +47,28 @@ export default function AccessCheck() {
     // GuildPass Mobile: Exit functional execution container scope block.
   } | null>(null);
 
+  // GuildPass Mobile: Handle deep link parameters
+  useEffect(() => {
+    if (params.guildId) setGuildId(params.guildId);
+    if (params.resourceId) setResourceId(params.resourceId);
+    if (params.walletAddress) setAddress(params.walletAddress);
+    
+    // Auto-trigger check if all params are provided via deep link
+    if (params.guildId && params.resourceId) {
+      const walletToUse = params.walletAddress || currentWallet;
+      if (walletToUse) {
+        setCheckParams({
+          walletAddress: walletToUse,
+          guildId: params.guildId,
+          resourceId: params.resourceId,
+        });
+      }
+    }
+  }, [params, currentWallet]);
+
   const checkParamsNonNull = checkParams || { walletAddress: "", guildId: "", resourceId: "" };
+
+  // GuildPass Mobile: Local UI-scoped constant or state representation.
   const {
     data: result,
     isLoading,
