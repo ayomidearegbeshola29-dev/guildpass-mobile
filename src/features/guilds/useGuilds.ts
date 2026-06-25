@@ -12,6 +12,7 @@ export const useGuilds = () => {
       queryKey: ["guild", guildId],
       queryFn: () => guildPassClient.guilds.getGuild({ guildId }),
       enabled: !!guildId,
+      networkMode: "offlineFirst",
       // GuildPass Mobile: Exit functional execution container scope block.
     });
     // GuildPass Mobile: Exit functional execution container scope block.
@@ -24,6 +25,7 @@ export const useGuilds = () => {
       queryKey: ["guild-config", guildId],
       queryFn: () => guildPassClient.guilds.getGuildConfig({ guildId }),
       enabled: !!guildId,
+      networkMode: "offlineFirst",
       // GuildPass Mobile: Exit functional execution container scope block.
     });
     // GuildPass Mobile: Exit functional execution container scope block.
@@ -36,6 +38,7 @@ export const useGuilds = () => {
       queryKey: ["guild-roles", guildId],
       queryFn: () => guildPassClient.roles.getRoles({ guildId }),
       enabled: !!guildId,
+      networkMode: "offlineFirst",
       // GuildPass Mobile: Exit functional execution container scope block.
     });
     // GuildPass Mobile: Exit functional execution container scope block.

@@ -1,17 +1,13 @@
-// GuildPass Mobile: Import package module dependencies.
 import { QueryClient } from "@tanstack/react-query";
+import { QUERY_GC_TIME_MS, QUERY_STALE_TIME_MS } from "./offlineCache";
 
-// GuildPass Mobile: Exported screen, component definition, or state hooks.
 export const queryClient = new QueryClient({
-  // GuildPass Mobile: Enter functional execution container scope block.
   defaultOptions: {
-    // GuildPass Mobile: Enter functional execution container scope block.
     queries: {
       retry: 2,
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      // GuildPass Mobile: Exit functional execution container scope block.
+      staleTime: QUERY_STALE_TIME_MS,
+      gcTime: QUERY_GC_TIME_MS,
+      networkMode: "offlineFirst",
     },
-    // GuildPass Mobile: Exit functional execution container scope block.
   },
-  // GuildPass Mobile: Exit functional execution container scope block.
 });

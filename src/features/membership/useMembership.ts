@@ -18,6 +18,7 @@ export const useMembership = (walletAddress: string | null) => {
           // GuildPass Mobile: Exit functional execution container scope block.
         }),
       enabled: !!walletAddress && !!guildId,
+      networkMode: "offlineFirst",
       // GuildPass Mobile: Exit functional execution container scope block.
     });
     // GuildPass Mobile: Exit functional execution container scope block.
@@ -36,6 +37,7 @@ export const useMembership = (walletAddress: string | null) => {
           // GuildPass Mobile: Exit functional execution container scope block.
         }),
       enabled: !!walletAddress && !!guildId,
+      networkMode: "offlineFirst",
       // GuildPass Mobile: Exit functional execution container scope block.
     });
     // GuildPass Mobile: Exit functional execution container scope block.

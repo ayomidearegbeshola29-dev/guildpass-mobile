@@ -11,12 +11,23 @@ import { Button } from "../src/components/Button";
 // GuildPass Mobile: Import package module dependencies.
 import Constants from "expo-constants";
 // GuildPass Mobile: Pull in react-native, expo, or external state libraries.
-import React from "react";
+import { resetAppState } from "../src/lib/resetAppState";
+// GuildPass Mobile: Import package module dependencies.
+import React, { useState } from "react";
 
 // GuildPass Mobile: Exposed interface structure for local navigation layouts.
 export default function Settings() {
-  // GuildPass Mobile: Variable binding and property initialization.
-  const { disconnect, isConnected } = useWallet();
+  const { isConnected } = useWallet();
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleReset = async () => {
+    setIsResetting(true);
+    try {
+      await resetAppState();
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   // GuildPass Mobile: Local UI-scoped constant or state representation.
   const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? "https://api.guildpass.xyz";
@@ -52,9 +63,10 @@ export default function Settings() {
           </Text>
           <Button
             title="Reset App State"
-            onPress={disconnect}
+            onPress={handleReset}
             variant="danger"
-            disabled={!isConnected}
+            loading={isResetting}
+            disabled={!isConnected || isResetting}
           />
         </Card>
 

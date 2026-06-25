@@ -1,79 +1,44 @@
-// GuildPass Mobile: Pull in react-native, expo, or external state libraries.
 import { View, Text, ScrollView, TextInput } from "react-native";
-// GuildPass Mobile: Import package module dependencies.
 import React, { useEffect, useState } from "react";
 // GuildPass Mobile: Pull in react-native, expo, or external state libraries.
 import { useLocalSearchParams, useRouter } from "expo-router";
-// GuildPass Mobile: Pull in react-native, expo, or external state libraries.
 import { useWallet } from "../src/features/wallet/useWallet";
-// GuildPass Mobile: Import package module dependencies.
 import { useAccessCheck } from "../src/features/access/useAccessCheck";
 import type { ParsedAccessQrPayload } from "../src/features/access/qrPayload";
 import { parseAccessQrPayload } from "../src/features/access/qrPayload";
-// GuildPass Mobile: Pull in react-native, expo, or external state libraries.
 import { AppHeader } from "../src/components/AppHeader";
-// GuildPass Mobile: Import package module dependencies.
 import { Card } from "../src/components/Card";
-// GuildPass Mobile: Pull in react-native, expo, or external state libraries.
 import { Button } from "../src/components/Button";
-// GuildPass Mobile: Import package module dependencies.
 import { WalletInput } from "../src/components/WalletInput";
-// GuildPass Mobile: Pull in react-native, expo, or external state libraries.
 import { AccessStatusCard } from "../src/components/AccessStatusCard";
-// GuildPass Mobile: Import package module dependencies.
 import { LoadingState } from "../src/components/LoadingState";
+import { StaleDataBanner } from "../src/components/StaleDataBanner";
+import { useStaleQuery } from "../src/features/offline/useStaleQuery";
 
-// GuildPass Mobile: Exposed interface structure for local navigation layouts.
 export default function AccessCheck() {
   const router = useRouter();
   const { qrPayload } = useLocalSearchParams<{ qrPayload?: string | string[] }>();
-  // GuildPass Mobile: Variable binding and property initialization.
   const { walletAddress: currentWallet } = useWallet();
-  // GuildPass Mobile: Local UI-scoped constant or state representation.
-  const params = useLocalSearchParams<{ guildId?: string; resourceId?: string; walletAddress?: string }>();
-  // GuildPass Mobile: Local UI-scoped constant or state representation.
   const [address, setAddress] = useState(currentWallet || "");
-  // GuildPass Mobile: Variable binding and property initialization.
   const [guildId, setGuildId] = useState("");
-  // GuildPass Mobile: Local UI-scoped constant or state representation.
   const [resourceId, setResourceId] = useState("");
   const [scanError, setScanError] = useState<string | null>(null);
   const [scannedPayload, setScannedPayload] = useState<ParsedAccessQrPayload | null>(null);
-  // GuildPass Mobile: Variable binding and property initialization.
   const [checkParams, setCheckParams] = useState<{
     walletAddress: string;
     guildId: string;
     resourceId: string;
-    // GuildPass Mobile: Exit functional execution container scope block.
   } | null>(null);
 
-  // GuildPass Mobile: Handle deep link parameters
-  useEffect(() => {
-    if (params.guildId) setGuildId(params.guildId);
-    if (params.resourceId) setResourceId(params.resourceId);
-    if (params.walletAddress) setAddress(params.walletAddress);
-    
-    // Auto-trigger check if all params are provided via deep link
-    if (params.guildId && params.resourceId) {
-      const walletToUse = params.walletAddress || currentWallet;
-      if (walletToUse) {
-        setCheckParams({
-          walletAddress: walletToUse,
-          guildId: params.guildId,
-          resourceId: params.resourceId,
-        });
-      }
-    }
-  }, [params, currentWallet]);
-
-  const checkParamsNonNull = checkParams || { walletAddress: "", guildId: "", resourceId: "" };
-
-  // GuildPass Mobile: Local UI-scoped constant or state representation.
+  const checkParamsNonNull = checkParams ?? { walletAddress: "", guildId: "", resourceId: "" };
+  const accessQuery = useAccessCheck(checkParamsNonNull);
   const {
     data: result,
     isLoading,
     error,
-  } = useAccessCheck(checkParamsNonNull);
+    isPending,
+  } = accessQuery;
+  const staleState = useStaleQuery(accessQuery);
 
   useEffect(() => {
     const rawPayload = Array.isArray(qrPayload) ? qrPayload[0] : qrPayload;
@@ -97,17 +62,12 @@ export default function AccessCheck() {
     }
   }, [currentWallet, qrPayload]);
 
-  // GuildPass Mobile: Local UI-scoped constant or state representation.
   const handleCheck = () => {
-    // GuildPass Mobile: Evaluate branch condition check for UI guards.
     if (address && guildId && resourceId) {
       setCheckParams({ walletAddress: address, guildId, resourceId });
-      // GuildPass Mobile: Exit functional execution container scope block.
     }
-    // GuildPass Mobile: Exit functional execution container scope block.
   };
 
-  // GuildPass Mobile: Terminate block execution context and send back value.
   return (
     <View className="flex-1 bg-background">
       <AppHeader title="Access Check" showBack />
@@ -116,7 +76,6 @@ export default function AccessCheck() {
           <WalletInput
             value={address}
             onChangeText={setAddress}
-            // GuildPass Mobile: Variable binding and property initialization.
             placeholder="Wallet address (0x...)"
           />
 
@@ -187,10 +146,17 @@ export default function AccessCheck() {
           </Card>
         )}
 
-        {isLoading && <LoadingState message="Checking protocol permissions..." />}
+        {isLoading && isPending && <LoadingState message="Checking protocol permissions..." />}
 
         {result && (
           <View className="mb-12">
+            {staleState.isStale && staleState.reason ? (
+              <StaleDataBanner
+                reason={staleState.reason}
+                lastSyncedAt={staleState.lastSyncedAt}
+                cautionary
+              />
+            ) : null}
             <AccessStatusCard
               hasAccess={result.hasAccess}
               reason={result.reason}
@@ -200,8 +166,12 @@ export default function AccessCheck() {
           </View>
         )}
 
-        {error && (
-          <Card className="border-error bg-error/5" accessibilityRole="alert" accessibilityLabel="Error checking access. Please verify your inputs and try again.">
+        {error && !result && (
+          <Card
+            className="border-error bg-error/5"
+            accessibilityRole="alert"
+            accessibilityLabel="Error checking access. Please verify your inputs and try again."
+          >
             <Text className="text-error font-bold">Error checking access</Text>
             <Text className="text-error/80 text-sm mt-1">
               Please verify your inputs and try again.
@@ -211,5 +181,4 @@ export default function AccessCheck() {
       </ScrollView>
     </View>
   );
-  // GuildPass Mobile: Exit functional execution container scope block.
 }
